@@ -565,6 +565,18 @@ void dcd_edpt_clear_stall(uint8_t rhport, uint8_t ep_addr)
   }
 }
 
+void dcd_edpt_reset_data_toggle(uint8_t rhport, uint8_t ep_addr)
+{
+  (void) rhport;
+
+  if (tu_edpt_number(ep_addr))
+  {
+    struct hw_endpoint *ep = hw_endpoint_get_by_addr(ep_addr);
+    ep->next_pid = 0;
+    _hw_endpoint_buffer_control_clear_mask32(ep, USB_BUF_CTRL_DATA1_PID);
+  }
+}
+
 void dcd_edpt_close (uint8_t rhport, uint8_t ep_addr)
 {
     (void) rhport;
