@@ -367,6 +367,15 @@ static void __tusb_irq_path_func(dcd_rp2040_irq)(void)
     usb_hw_clear->sie_status = USB_SIE_STATUS_RESUME_BITS;
   }
 
+  if ( status & USB_INTS_ERROR_DATA_SEQ_BITS )
+  {
+    handled |= USB_INTS_ERROR_DATA_SEQ_BITS;
+    usb_hw_clear->sie_status = USB_SIE_STATUS_DATA_SEQ_ERROR_BITS;
+    TU_LOG(3, "  Seq Error\r\n");
+    //panic("Data Seq Error \n");
+    printf("Data Seq Error\r\n");
+  }
+
   if ( status ^ handled )
   {
     panic("Unhandled IRQ 0x%x\n", (uint) (status ^ handled));
@@ -416,6 +425,7 @@ void dcd_init (uint8_t rhport)
   usb_hw->sie_ctrl = USB_SIE_CTRL_EP0_INT_1BUF_BITS;
   usb_hw->inte     = USB_INTS_BUFF_STATUS_BITS | USB_INTS_BUS_RESET_BITS | USB_INTS_SETUP_REQ_BITS |
                      USB_INTS_DEV_SUSPEND_BITS | USB_INTS_DEV_RESUME_FROM_HOST_BITS |
+		     USB_INTS_ERROR_DATA_SEQ_BITS |
                      (FORCE_VBUS_DETECT ? 0 : USB_INTS_DEV_CONN_DIS_BITS);
 
   dcd_connect(rhport);
